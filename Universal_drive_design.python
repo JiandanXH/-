@@ -1,0 +1,107 @@
+###第一步：原始数据的输入
+m=38850
+Pemax=45.6
+Nm=2100
+n=1
+Temax=156.8
+G2=12800
+r=0.3
+hg=0.6
+kd=1
+k=2.2
+i1=5.557
+i0=5.833
+iF=1
+im=0.7
+N=0.9
+Nm=0.9
+G1=12800
+m1=0.86
+fai=1.25
+ia=4.11
+
+###第二步：万向传动轴计算载荷
+Tse2=(kd*Temax*k*i1*iF*i0*N)/(2*n)
+Tss2=(G1*m1*fai*r)/(2*im*Nm)
+print(Tse2,Tss2)
+###使用if条件找出Ts
+if Tse2<Tss2:
+ Ts=Tse2
+else:
+ Ts=Tss2
+print(Ts)
+
+###第三步：计算传力钢球的直径
+d=(Ts/0.21)**(1/3)
+print(d)
+
+###第四步：计算球笼式万向节的主要参数
+R=1.71*d
+B=1.8*d
+D=4.9*d
+B1=1.8*d
+D1=2.5*d
+b=0.185*d
+b1=d
+L=1.3*d
+h=0.18*d
+d1=1.4*d
+D11=1.55*d
+L1=2.4*d
+print(R,B,D,B1,D1,b)
+print(b1,L,h,d1,D11,L1)
+
+###转矩校核
+Mn=0.32366*d**3
+segema=1
+miu=1
+Ks=1.2
+Mm=Ts
+iS=[5.57,2.769,1.644,1.000,0.794]
+Ma=(segema/miu)*Temax*ia*iS[0]
+Mh=Ks*miu*(m/ia)*r
+print(Ma,Mh,Mn)
+
+###使用寿命校核
+ax=[0.01,0.06,0.18,0.30,0.45]
+ix=[iS[0]*ia,iS[1]*ia,iS[2]*ia,iS[3]*ia,iS[4]*ia]
+for i in range (0,5):
+ print(round(ix[i],1),end="  ")
+print()
+Nx=[2100/ix[0],2100/ix[1],2100/ix[2],2100/ix[3],2100/ix[4]]
+for i in range (0,5):
+ print(round(Nx[i],1),end="  ")
+print()
+Vx=[0.377*r*Nx[0],0.377*r*Nx[1],0.377*r*Nx[2],0.377*r*Nx[3],0.377*r*Nx[4]]
+for i in range (0,5):
+ print(round(Vx[i],1),end="  ")
+print()
+Mx=[Temax*ix[0]/3,Temax*ix[1]/3,Temax*ix[2]/3,Temax*ix[3]/3,Temax*ix[4]/3]
+for i in range (0,5):
+ print(round(Mx[i],1),end="  ")
+print()
+Ax=1.5
+for i in range(0,5):
+ Lhx=(25399/(Nx[i]**0.577))*((Ax*Temax/Mx[i])**3)
+ print(round(Lhx,1),end="  ")
+print()
+Lhx=[(25399/(Nx[0]**0.577))*((Ax*Temax/Mx[0])**3),
+(25399/(Nx[1]**0.577))*((Ax*Temax/Mx[1])**3),
+(25399/(Nx[2]**0.577))*((Ax*Temax/Mx[2])**3),
+(25399/(Nx[3]**0.577))*((Ax*Temax/Mx[3])**3),
+(25399/(Nx[4]**0.577))*((Ax*Temax/Mx[4])**3)]
+for i in range (0,5):
+  Lh1=0
+  Lh1=Lh1+ax[i]/Lhx[i]
+Lh=1/Lh1
+print(round(Lh,1))
+for i in range(0,5):
+  Vax=0
+  Vax=Vax+ax[i]*Vx[i]
+Ls=Lh*Vax
+print("使用寿命=",round(Ls,1),"Km")
+
+###传动轴校核
+Wp=(3.14*(round(d1)*0.001)**3)/16
+TAOmax=Mh/Wp
+print(Wp,round(TAOmax,1))
